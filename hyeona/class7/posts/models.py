@@ -32,7 +32,7 @@ class Comment(models.Model):
     created = models.DateTimeField("생성일시", auto_now_add=True)
 
 class Hashtag(models.Model):
-    user = models.CharField("태그명", max_length=50)
+    name = models.CharField("태그명", max_length=50)
 
     def __str__(self):
         return self.name
