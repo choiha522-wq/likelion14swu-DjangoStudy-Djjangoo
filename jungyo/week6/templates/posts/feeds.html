@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <nav id="navbar">
+        <h1>
+           <a href="{% url 'posts:feeds' %}">Pystagram</a>
+        </h1>
+        <a href="{% url 'posts:post_add' %}">Add post</a>
+        <a href="{% url 'users:logout' %}">Logout</a>
+    </nav>
+    <div id="post-list">
+        {% for post in posts %}
+            <div id="post-{{ post.id }}" class="post" style="border-bottom: 1px solid #eee; padding: 20px; max-width: 960px; margin: 0 auto;">
+                <div class="post-images splide">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            {% for image in post.postimage_set.all %}
+                                {% if image.photo %}
+                                <li class="splide__slide">
+                                    <img src="{{ image.photo.url }}">
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <h2>{{ post.content }}</h2>
+                <div class="post-buttons">
+                    <button>Likes(0)</button>
+                    <span>Comments({{ post.comment_set.count }})</span>
+                </div>
+                <ul class="comments">
+                    {% for comment in post.comment_set.all %}
+                        <li class="comment">
+                            <span>{{ comment.user.username }}</span>
+                            <span>{{ comment.content }}</span>
+                            {% if user == comment.user %}
+                                <form method="POST" action="{% url 'posts:comment_delete' comment_id=comment.id %}/">
+                                    {% csrf_token %}
+                                    <button type="submit">삭제</button>
+                                </form>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <small>{{ post.created }}</small>
+                <div class="post-comment-create">
+                    <form method="POST" action="{% url 'posts:comment_add' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="post" value="{{ post.id }}">
+                        {{ comment_form.content }}
+                        <button type="submit">게시</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <script>
+        const elms = document.getElementsByClassName('splide')
+        for (let i = 0; i < elms.length; i++) {
+            new Splide(elms[i]).mount();
+        }
+    </script>
+{% endblock %}
